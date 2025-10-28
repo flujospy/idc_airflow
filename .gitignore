@@ -1,0 +1,29 @@
+# Ignorar entornos virtuales
+venv/
+env/
+py_etl/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Airflow runtime files
+airflow_home/
+logs/
+airflow.db
+airflow.sqlite
+standalone_admin_password.txt
+
+# Config y entornos
+.env
+*.env
+.env.*
+
+# IDE y sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
