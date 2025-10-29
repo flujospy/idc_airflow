@@ -1,0 +1,14 @@
+# Normaliza fin de línea
+* text=auto
+
+# Trata binarios como binarios (sin diffs enormes)
+*.parquet binary
+*.feather binary
+*.orc binary
+
+# CSV/TSV como texto (para diffs más limpios)
+*.csv text
+*.tsv text
+
+# Notebooks como binarios (si no quieres diffs JSON ruidosos)
+*.ipynb binary
