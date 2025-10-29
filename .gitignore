@@ -1,29 +1,69 @@
-# Ignorar entornos virtuales
-venv/
-env/
-py_etl/
-__pycache__/
+# ===== Raíz del monorepo C:\airflow =====
+
+# Entornos
+/venv/
+/env/
+/.venv/
+/.pyenv/
+
+# Prefect project (subcarpeta)
+/py_etl/.env
+/py_etl/.env.*
+/py_etl/__pycache__/
+/py_etl/.prefect/
+/py_etl/flow_run_logs/
+/py_etl/task_run_logs/
+/py_etl/logs/
+/py_etl/data/
+/py_etl/artifacts/
+/py_etl/checkpoints/
+/py_etl/tmp/
+/py_etl/temp/
+
+# Artefactos frecuentes
 *.pyc
 *.pyo
 *.pyd
+*.egg
 *.egg-info/
-dist/
+*.log
+*.bak
+*.tmp
+
+# Salidas tabulares/columnar (ajusta a gusto)
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.orc
+*.xlsx
+*.jsonl
+
+# Deployments Prefect (si no quieres versionarlos, descomenta)
+/py_etl/*.yaml
+# /py_etl/*.yml
+
+# Herramientas y build
 build/
+dist/
+pip-wheel-metadata/
+.python-version
+.mypy_cache/
+.pytest_cache/
+.coverage*
+htmlcov/
+.tox/
+.ruff_cache/
+.pyre/
+.dmypy.json
+.pytype/
 
-# Airflow runtime files
-airflow_home/
-logs/
-airflow.db
-airflow.sqlite
-standalone_admin_password.txt
+# Notebooks
+.ipynb_checkpoints/
 
-# Config y entornos
-.env
-*.env
-.env.*
-
-# IDE y sistema
+# IDE / OS
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+desktop.ini

@@ -1,0 +1,86 @@
+# =========================
+# Proyecto ETL con Prefect
+# =========================
+
+# ----- Entornos / virtualenv -----
+/venv/
+/env/
+/.venv/
+/.pyenv/
+/py_etl/              # si el venv está dentro de esta carpeta; si NO, quita esta línea
+
+# ----- Credenciales / config local -----
+/.env
+*.env
+.env.*                # ej. .env.development.local
+
+# ----- Datos y artefactos generados -----
+/data/
+/logs/
+/artifacts/
+/checkpoints/
+/tmp/
+/temp/
+
+# Si no quieres versionar salidas tabulares/columnar:
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.orc
+*.xlsx
+*.jsonl
+
+# ----- Python cache / builds -----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+build/
+dist/
+pip-wheel-metadata/
+.python-version
+.mypy_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.ruff_cache/
+.pyre/
+.dmypy.json
+.pytype/
+
+# ----- Notebooks -----
+.ipynb_checkpoints/
+
+# ----- Prefect (archivos locales / cache) -----
+.prefect/
+.prefect*            # metadatos locales
+orion.db             # base local de Prefect Orion (si existiera)
+flow_run_logs/
+task_run_logs/
+
+# ----- Deployments Prefect (opcional) -----
+# Descomenta si NO quieres versionar los YAML de deployments
+# *.yaml
+# *.yml
+
+# ----- IDE / OS -----
+# VSCode
+.vscode/
+# JetBrains
+.idea/
+# MacOS / Windows
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ----- Otros que a veces se cuelan -----
+*.bak
+*.tmp
+*.log
+~$*
