@@ -1,37 +1,42 @@
-# ===== Raíz del monorepo C:\airflow =====
+# ===== Raíz del proyecto ETL (C:\airflow\etl_project) =====
 
-# Entornos
-/venv/
-/env/
-/.venv/
-/.pyenv/
+# Entornos virtuales
+venv/
+env/
+.venv/
+.pyenv/
+.python-version
+
+# Configuración sensible
+.env
+.env.*
 config.json
+tasks/config.json
 
-# Prefect project (subcarpeta)
-/py_etl/.env
-/py_etl/.env.*
-/py_etl/__pycache__/
-/py_etl/.prefect/
-/py_etl/flow_run_logs/
-/py_etl/task_run_logs/
-/py_etl/logs/
-/py_etl/data/
-/py_etl/artifacts/
-/py_etl/checkpoints/
-/py_etl/tmp/
-/py_etl/temp/
+# Prefect / artefactos / logs
+.prefect/
+flow_run_logs/
+task_run_logs/
+logs/
+artifacts/
+checkpoints/
+tmp/
+temp/
 
-# Artefactos frecuentes
+# Datos locales (no versionar input ni output)
+data/
+# Si deseas más granularidad:
+# data/input/
+# data/output/
+
+# Bytecode y caché Python
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.egg
-*.egg-info/
-*.log
-*.bak
-*.tmp
+*.pyd
 
-# Salidas tabulares/columnar (ajusta a gusto)
+# Archivos tabulares o intermedios
 *.csv
 *.tsv
 *.parquet
@@ -40,32 +45,22 @@ config.json
 *.xlsx
 *.jsonl
 
-# Deployments Prefect (si no quieres versionarlos, descomenta)
-/py_etl/*.yaml
-# /py_etl/*.yml
-
-# Herramientas y build
+# Construcciones y metadata
 build/
 dist/
 pip-wheel-metadata/
-.python-version
 .mypy_cache/
 .pytest_cache/
-.coverage*
-htmlcov/
-.tox/
 .ruff_cache/
 .pyre/
-.dmypy.json
-.pytype/
-
-# Directorios específicos
-config/__pycache__/
+.tox/
+htmlcov/
+.coverage*
 
 # Notebooks
 .ipynb_checkpoints/
 
-# IDE / OS
+# IDEs y sistema operativo
 .vscode/
 .idea/
 .DS_Store
