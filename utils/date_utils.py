@@ -4,7 +4,7 @@ from typing import List, Tuple
 def split_date_range(
     fecha_inicio: str,
     fecha_fin: str,
-    batch_days: int = 15
+    batch_days: int = 5
 ) -> List[Tuple[str, str]]:
     """Divide un rango de fechas en lotes más pequeños"""
     start = datetime.strptime(fecha_inicio, '%Y-%m-%d')

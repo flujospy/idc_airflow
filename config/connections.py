@@ -39,8 +39,8 @@ class APIConnection:
 
     def __init__(self):
         # Normaliza URLs
-        self.base_url: Optional[str] = (settings.API_BASE_URL or "").rstrip("/")
-        self.auth_url: Optional[str] = (settings.API_AUTH_URL or "").strip() or None
+        self.base_url = (settings.API_BASE_URL_AR or settings.API_BASE_URL or "").rstrip("/")
+        self.auth_url = (settings.API_AUTH_URL_AR or settings.API_AUTH_URL or "").strip() or None
 
         # Credenciales de login
         self.username: Optional[str] = settings.API_USERNAME or None
@@ -63,6 +63,19 @@ class APIConnection:
         self.token_json_keys: tuple[str, ...] = (
             getattr(settings, "API_TOKEN_JSON_KEY", None) or "token,access_token,jwt"
         ).split(",")
+
+
+class APIConnectionAR(APIConnection):
+    """
+    Variante de APIConnection para la API de Aportes y Retiros.
+    Reutiliza usuario/contraseña, pero usa otras URLs base.
+    """
+    def __init__(self):
+        super().__init__()
+
+        
+        self.base_url = (settings.API_BASE_URL_AR or settings.API_BASE_URL or "").rstrip("/")
+        self.auth_url = (settings.API_AUTH_URL_AR or settings.API_AUTH_URL or "").strip() or None
 
     # --------- Lógica de autenticación ---------
 
@@ -120,14 +133,14 @@ class APIConnection:
         Si no, renueva automáticamente cuando vence.
         """
         if self.static_token:
-            # Token fijo administrado fuera. No caduca aquí.
+            
             return self.static_token
 
-        # Si ya tengo token y no ha vencido, úsalo
+        
         if self._token and self._token_expiry and _utcnow() < self._token_expiry:
             return self._token
 
-        # Renovar / primer login
+        
         return self._login_and_get_token()
 
     def get_headers(self) -> Dict[str, str]:
@@ -142,12 +155,12 @@ class APIConnection:
             headers[self.token_header_name] = f"{self.token_prefix}{self.static_token}".strip()
             return headers
 
-        token = self.get_token()  # asegura tener token fresco
-        # Por defecto usamos Authorization: Bearer <token>
+        token = self.get_token()  
+        
         headers[self.token_header_name] = f"{self.token_prefix}{token}".strip()
         return headers
 
-    # Conveniencia para construir URLs
+    
     def build_url(self, path: str) -> str:
         path = path or ""
         if not self.base_url:
@@ -167,8 +180,7 @@ class MySQLConnection:
     @property
     def engine(self):
         if self._engine is None:
-            # settings.mysql_connection_string debe ser algo como:
-            # mysql+pymysql://user:pass@host:3306/dbname?charset=utf8mb4
+           
             conn_str = getattr(settings, "mysql_connection_string", None)
             if not conn_str:
                 raise RuntimeError("mysql_connection_string no está definido en settings.")
@@ -199,5 +211,11 @@ class MySQLConnection:
 
 
 # Instancias globales
+# API Saldos 
 api_connection = APIConnection()
+
+# API Aportes/Retiros 
+api_connection_ar = APIConnectionAR()
+
+# MySQL
 mysql_connection = MySQLConnection()

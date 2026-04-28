@@ -69,3 +69,99 @@ def validate_data(df: pd.DataFrame) -> pd.DataFrame:
     logger.info("Validación completada exitosamente")
     
     return df
+
+# transformacion  Aportes y Retiros
+
+@task(name = "Transformacion movimientos (aportes/retiros)",retries=0)
+def transform_movimientos(df:pd.DataFrame)->pd.DataFrame:
+
+    if df.empty:
+        return df
+    
+    rename_map = {
+        "fechaMovimiento": "fecha_movimiento",
+        "numeroMovimiento": "numero_movimiento",
+        "codigoPersona": "codigo_persona",
+        "nombreCliente": "nombre_cliente",
+        "hechoPor": "hecho_por",
+        "tipoObservaciones": "tipo_observaciones",
+        "valorParticipacion": "valor_participacion",
+        "participacionesRestantes": "participaciones_restantes",
+        "participaciones": "participaciones",
+        "monto": "monto",
+        "saldoAnterior": "saldo_anterior",
+        "saldoResultante": "saldo_resultante",
+        "saldoParticipacionesAnterior": "saldo_participaciones_anterior",
+        "tipoMovimiento": "tipo_movimiento",
+        "producto": "producto",
+        "fechaRegistro": "fecha_registro",
+        "codigoMovimiento": "codigo_movimiento",
+        "codigoCuenta": "codigo_cuenta",
+        "numeroCuenta": "numero_cuenta",
+    }
+
+##Convierte nombres de la API (camelCase) a convención de BD (snake_case)
+##Usa comprensión de diccionario con if k in df.columns para seguridad:
+ 
+    df = df.rename(columns={
+        k: v for k, v in rename_map.items() if k in df.columns
+    })
+
+
+#Convierte strings de fecha → objetos datetime
+# errors="coerce": Fechas inválidas se convierten a NaT (Not a Time) en lugar de fallar
+    for col in ["fecha_movimiento", "fecha_registro"]:
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col], errors = "coerce")
+
+
+    if "fecha_movimiento" in df.columns:
+        df["fecha"] = df["fecha_movimiento"].dt.date
+
+    # Campos numéricos → tipo numérico
+    #Convierte strings numéricos → tipos float64 o int64
+    #errors="coerce": Valores no numéricos → NaN (no falla)
+
+    numeric_cols = [
+        "numero_movimiento",
+        "codigo_cuenta",
+        "numero_cuenta",
+        "monto",
+        "saldo_anterior",
+        "saldo_resultante",
+        "saldo_participaciones_anterior",
+        "participaciones",
+        "participaciones_restantes",
+        "valor_participacion",
+    ]
+
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col]= pd.to_numeric(df[col],errors="coerce")
+
+
+    
+    if "id_movimiento" not in df.columns:
+        def _build_id(row): 
+
+            cod_mov = str(row.get("codigo_movimiento","") or "").strip()
+            cod_cta = str(row.get("codigo_cuenta","")or "").strip()
+
+            fecha=row.get("fecha_movimiento")
+
+            #convierte la fecha en iso
+            if pd.notna(fecha):
+                fecha_str = pd.to_datetime(fecha).isoformat()
+            else:
+                fecha_str="" 
+            
+            return f"{cod_mov}-{cod_cta}-{fecha_str}"
+        
+
+        df["id_movimiento"] = df.apply(_build_id,axis=1)
+
+    return df
+
+
+
+

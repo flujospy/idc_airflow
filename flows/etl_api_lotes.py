@@ -2,7 +2,7 @@ from prefect import flow, get_run_logger
 from prefect.task_runners import ConcurrentTaskRunner
 from datetime import datetime
 from typing import Optional
-from utils.db import get_engine
+
 
 from tasks.extract import authenticate_api, extract_from_api_batch
 from tasks.transform import clean_and_transform, validate_data
@@ -16,6 +16,7 @@ from tasks.etl_control import (
 )
 from utils.date_utils import split_date_range
 from config.settings import settings
+from tasks.limpiar_datos import limpiar_codigo_persona
 
 @flow(
     name="ETL API con Control y Logs",
@@ -100,7 +101,7 @@ def etl_api_to_mysql_flow(
         # PASO 5: Procesar cada lote
         logger.info("\n PASO 5: Procesando lotes")
         
-        engine = get_engine()
+        #engine = get_engine()
 
         for i, (inicio_lote, fin_lote) in enumerate(lotes, 1):
             logger.info(f"\n--- Procesando Lote {i}/{len(lotes)} ---")
@@ -137,7 +138,15 @@ def etl_api_to_mysql_flow(
                 
                 # Transformación
                 df_clean = clean_and_transform(df_raw)
+                df_clean = limpiar_codigo_persona(df_clean)
                 df_valid = validate_data(df_clean)
+                batch_rows = load_to_mysql(
+                    df=df_valid,
+                    table=tabla_destino,
+                    fecha_inicio=inicio_lote,
+                    fecha_fin=fin_lote,
+                    date_column="fecha"
+                )
                 
                 # Carga
                 batch_rows = load_to_mysql(
@@ -145,7 +154,8 @@ def etl_api_to_mysql_flow(
                     table=tabla_destino,
                     fecha_inicio=inicio_lote,
                     fecha_fin=fin_lote,
-                    engine=engine
+                    date_column="fecha"
+                    #engine=engine
                 )
                 
                 total_registros += batch_rows

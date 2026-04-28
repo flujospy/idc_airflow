@@ -18,7 +18,7 @@ def load_to_mysql(
     table: str,
     fecha_inicio: str,
     fecha_fin: str,
-    engine
+    date_column: str = DATE_COLUMN,
     
 ) -> int:
     """
@@ -27,39 +27,50 @@ def load_to_mysql(
     """
     logger = get_run_logger()
     n = int(len(df) if df is not None else 0)
-    logger.info(f"Cargando {n} registros en {table} para rango {fecha_inicio} a {fecha_fin}")
-    
-    #if df.empty:
-    #    logger.warning("DataFrame vacío, no hay datos para cargar")
-    #    return 0
-    
-    if df is None or df.empty:
-        logger.info("DataFrame vacío: no se ejecuta Delete ni Load.")
+
+    logger.info(
+        f"[LOAD] Recibidos {n} registros para {table} "
+        f"(rango {fecha_inicio}..{fecha_fin})"
+    )
 
 
-    delete_sql = text(f"""
-        DELETE FROM `{table}`
-        WHERE `{DATE_COLUMN}` BETWEEN :start AND :end
-    """)
+
+    engine = mysql_connection.engine
+
 
     with engine.begin() as conn:
-        result = conn.execute(delete_sql, {"start":fecha_inicio,"end":fecha_fin})
+        delete_sql = text(
+            f"""
+            DELETE FROM `{table}`
+            WHERE `{date_column}` BETWEEN :start AND :end
+            """
+        )
+        result = conn.execute(
+            delete_sql,
+            {"start": fecha_inicio, "end": fecha_fin},
+        )
         deleted_rows = result.rowcount or 0
-        logger.info(f" {deleted_rows} registros eliminados en {table} (rango {fecha_inicio}..{fecha_fin})")
+        logger.info(
+            f"[LOAD] {deleted_rows} registros eliminados en {table} "
+            f"(rango {fecha_inicio}..{fecha_fin})"
+        )
 
-    
+        # Si el DF viene vacío, aquí terminamos
+        if n == 0:
+            logger.info(
+                f"[LOAD] DataFrame vacío, no se insertan registros en {table}"
+            )
+            return 0
 
-    #try:
-     #   logger.info(f"Cargando {len(df)} registros a tabla {table_name}")
-        
+        # Inserción con to_sql sobre la misma conexión/tx
         df.to_sql(
-                    name=table,
-                    con=conn,           
-                    if_exists='append',
-                    index=False,
-                    method='multi',
-                    chunksize=1000
-                )
+            name=table,
+            con=conn,
+            if_exists="append",
+            index=False,
+            method="multi",
+            chunksize=1000,
+        )
 
-    logger.info(f" {n} registros cargados en {table}")
+    logger.info(f"[LOAD] {n} registros insertados en {table}")
     return n

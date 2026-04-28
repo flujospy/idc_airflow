@@ -11,7 +11,7 @@ from config.settings import settings
 # =========================
 @task(
     name="Autenticar API",
-    retries=0,                 # si faltan credenciales, falla de una (no sirve reintentar)
+    retries=0,                 
     retry_delay_seconds=60,
     timeout_seconds=60
 )
@@ -22,7 +22,7 @@ def authenticate_api() -> Dict[str, str]:
     """
     logger = get_run_logger()
 
-    # 1) Si ya hay token directo en settings, úsalo
+    
     if getattr(settings, "API_TOKEN", None):
         token = str(settings.API_TOKEN).strip()
         if token:
@@ -38,7 +38,7 @@ def authenticate_api() -> Dict[str, str]:
         raise RuntimeError("No hay API_TOKEN ni credenciales/API_AUTH_URL para obtener token.")
 
     logger.info("Obteniendo token de autenticación...")
-    # Algunos servicios cambian los nombres de campos: probamos varias variantes comunes
+    
     payload_candidates = [
         {"username": user, "password": pwd},
         {"user": user, "password": pwd},
@@ -109,7 +109,7 @@ def authenticate_api() -> Dict[str, str]:
 def extract_from_api_batch(
     fecha_inicio: str,
     fecha_fin: str,
-    headers: Dict[str, str],                     # ← recibe headers aquí
+    headers: Dict[str, str],                    
     endpoint: str = "/General/ConsultarSaldos",
     numero_identificacion: Optional[str] = None,
     codigo_producto: Optional[int] = None,
@@ -126,7 +126,7 @@ def extract_from_api_batch(
         endpoint = "/" + endpoint
     url = f"{base_url}{endpoint}"
 
-    # NO volvemos a autenticar aquí
+    
     headers_preview = {k: (v if k.lower() != "authorization" else "Bearer ***") for k, v in headers.items()}
     logger.info(f"URL: {url!r}")
     logger.info(f"Headers: {headers_preview}")

@@ -9,7 +9,7 @@ import json
 class Settings(BaseSettings):
     """Configuración central de la app (via .env y archivos locales)."""
 
-    # --- Pydantic v2: configuración de carga de entorno ---
+   
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -17,48 +17,66 @@ class Settings(BaseSettings):
     )
 
     # =========================
-    # API (Snap Compliance)
+    # API (credenciales)
     # =========================
-    API_BASE_URL: str                      # p.ej. https://idc-external-api.snap-compliance.com
-    API_AUTH_URL: Optional[str] = None     # p.ej. https://idc-auth-api.snap-compliance.com/Login
+
     API_USERNAME: Optional[str] = None
     API_PASSWORD: Optional[str] = None
-    API_TOKEN: Optional[str] = None        # opcional: token fijo para pruebas
 
-    BATCH_DAYS: int = 15
+    # ======================================================
+    # API SALDOS 
+    # ======================================================
+
+    API_BASE_URL: str                      
+    API_AUTH_URL: Optional[str] = None     
+
+    # ======================================================
+    # API APORTES Y RETIROS (NUEVA API)
+    # ======================================================
+    API_BASE_URL_AR: Optional[str] = None      # 
+    API_AUTH_URL_AR: Optional[str] = None      #
+    
+    API_TOKEN: Optional[str] = None       
+    BATCH_DAYS: int = 5
 
     # Encabezados / extracción del token
-    API_TOKEN_HEADER: str = "Authorization"          # o "X-Session-Key"
-    API_TOKEN_PREFIX: str = "Bearer "                # incluye el espacio si aplica
+    API_TOKEN_HEADER: str = "Authorization"          
+    API_TOKEN_PREFIX: str = "Bearer "                
     API_TOKEN_JSON_KEY: str = "token,access_token,jwt"
     API_TIMEOUT: int = 30
-    API_TOKEN_TTL_SECONDS: int = 240                 # fallback si el JWT no trae exp
+    API_TOKEN_TTL_SECONDS: int = 240                 
 
     # =========================
     # MySQL
     # =========================
-    MYSQL_CONN_STR: Optional[str] = None             # nombre alterno
-    mysql_connection_string: Optional[str] = None    # nombre “oficial” usado por connections.py
+    MYSQL_CONN_STR: Optional[str] = None             
+    mysql_connection_string: Optional[str] = None    
 
     # =========================
-    # Prefect (opcional)
+    # Prefect 
     # =========================
     PREFECT_API_URL: Optional[str] = None
 
     # =========================
     # Control de ETL / Auditoría
     # =========================
-    ETL_CONTROL_TABLE: str = "etl_control"   # default, pero lo sobreescribiremos por .env
-    ETL_RUN_LOGS_TABLE: str = "etl_run_logs"      # default
+    ETL_CONTROL_TABLE: str = "etl_control"  
+    ETL_RUN_LOGS_TABLE: str = "etl_run_logs"       
     ETL_LOGS_TABLE: str = "etl_run_logs"
-    ETL_CONTROL_SCHEMA: Optional[str] = None      # p.ej. "public", "dbo"; si None no se usa schema
-    
+    ETL_CONTROL_SCHEMA: Optional[str] = None     
+    # =========================
+    # Excel_files 
+    # =========================
 
+    ONEDRIVE_EXCEL_PATH_TABLA_MAESTRA: Optional[str] = None
+
+
+    #ONEDRIVE_EXCEL_TABLA_MAESTRA_URL="C:\Users\user1\OneDrive - GRUPO IDC\DATOS\Tablas Datos.xlsx"
     # =========================
-    # Notificaciones (Slack)
+    # Notificaciones 
     # =========================
-    SLACK_WEBHOOK: Optional[str] = None              # si None, se omite notificación
-    SLACK_MENTIONS: Optional[str] = None             # p.ej. "<@UXXXX> @canal" (opcional)
+    SLACK_WEBHOOK: Optional[str] = None              
+    SLACK_MENTIONS: Optional[str] = None             
 
     # =========================
     # Config ETL por archivo JSON (rutas locales)
@@ -85,7 +103,7 @@ class Settings(BaseSettings):
                     Path(paths["logs_dir"]).resolve() if paths.get("logs_dir") else None
                 )
         except Exception:
-            # No rompemos settings por un JSON de rutas malformado
+            
             self.PATH_INPUT = self.PATH_INPUT or None
             self.PATH_OUTPUT = self.PATH_OUTPUT or None
             self.PATH_LOGS = self.PATH_LOGS or None
@@ -94,7 +112,7 @@ class Settings(BaseSettings):
 # ===== Instancia global de settings =====
 settings = Settings()
 
-# Unifica cadena de conexión MySQL si usas la variable antigua
+
 if not settings.mysql_connection_string and settings.MYSQL_CONN_STR:
     settings.mysql_connection_string = settings.MYSQL_CONN_STR
 
