@@ -53,6 +53,12 @@ class Settings(BaseSettings):
     mysql_connection_string: Optional[str] = None    
 
     # =========================
+    # PostgreSQL
+    # =========================
+    POSTGRES_CONN_STR: Optional[str] = None
+    postgres_connection_string: Optional[str] = None
+
+    # =========================
     # Prefect 
     # =========================
     PREFECT_API_URL: Optional[str] = None
@@ -117,6 +123,10 @@ if not settings.mysql_connection_string and settings.MYSQL_CONN_STR:
     settings.mysql_connection_string = settings.MYSQL_CONN_STR
 
 
+if not settings.postgres_connection_string and settings.POSTGRES_CONN_STR:
+    settings.postgres_connection_string = settings.POSTGRES_CONN_STR
 
-# Carga rutas del JSON si existe (opcional, no crítico)
+
+
+# Carga rutas del JSON si existe 
 settings.load_file_paths()

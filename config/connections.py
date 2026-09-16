@@ -210,6 +210,48 @@ class MySQLConnection:
             session.close()
 
 
+class PostgreSQLConnection:
+    """Gestiona la conexión a PostgreSQL con SQLAlchemy"""
+
+    def __init__(self):
+        self._engine = None
+        self._session_factory = None
+
+    @property
+    def engine(self):
+        if self._engine is None:
+
+            conn_str = getattr(settings, "postgres_connection_string", None)
+            if not conn_str:
+                raise RuntimeError("postgres_connection_string no está definido en settings.")
+
+            self._engine = create_engine(
+                conn_str,
+                pool_size=10,
+                max_overflow=20,
+                pool_pre_ping=True,
+                pool_recycle=3600,
+                echo=False,
+            )
+
+        return self._engine
+
+    @contextmanager
+    def get_session(self):
+        if self._session_factory is None:
+            self._session_factory = sessionmaker(bind=self.engine)
+
+        session = self._session_factory()
+        try:
+            yield session
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+
 # Instancias globales
 # API Saldos 
 api_connection = APIConnection()
@@ -219,3 +261,9 @@ api_connection_ar = APIConnectionAR()
 
 # MySQL
 mysql_connection = MySQLConnection()
+
+# PostgreSQL
+postgres_connection = PostgreSQLConnection()
+
+
+

@@ -5,7 +5,7 @@ from typing import Iterator, Tuple, Optional
 
 from flows.etl_api_lotes import etl_api_to_mysql_flow  # 
 
-def chunked_dates(start: str, end: str, step_days: int = 5) -> Iterator[Tuple[str, str]]:
+def chunked_dates(start: str, end: str, step_days: int = 15) -> Iterator[Tuple[str, str]]:
     d0 = datetime.strptime(start, "%Y-%m-%d").date()
     d1 = datetime.strptime(end, "%Y-%m-%d").date()
     cur = d0

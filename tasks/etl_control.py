@@ -8,9 +8,6 @@ from config.settings import settings
 from config.settings import settings
 
 
-
-
-
 @task(name="Iniciar registro de ejecución")
 
 def _q_table(table_name: str) -> str:
